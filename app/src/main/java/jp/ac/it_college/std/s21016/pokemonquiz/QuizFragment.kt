@@ -6,21 +6,29 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.UiThread
+import androidx.annotation.WorkerThread
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.navArgs
-import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
-import com.squareup.moshi.Types
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
+import com.squareup.picasso.Picasso
 import jp.ac.it_college.std.s21016.pokemonquiz.databinding.FragmentQuizBinding
-import jp.ac.it_college.std.s21016.pokemonquiz.service.Poke
+import jp.ac.it_college.std.s21016.pokemonquiz.json.PokemonInfo
+import jp.ac.it_college.std.s21016.pokemonquiz.service.PokemonService
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import retrofit2.Retrofit
+import retrofit2.converter.moshi.MoshiConverterFactory
+
+private const val BASE_URL = "https://pokeapi.co/api/v2/"
+private const val IMG_URL = "https://pokeapi.co/api/v2/info.sprites.other.officialArtwork.frontDefault"
 
 
 class QuizFragment : Fragment() {
     private var _binding: FragmentQuizBinding? = null
     private val binding get() = _binding!!
     private val moshi = Moshi.Builder().add(KotlinJsonAdapterFactory()).build()
-    private var pokemonList: List<Poke>? = null
-
     private val args: QuizFragmentArgs by navArgs()
 
     override fun onCreateView(
@@ -31,20 +39,34 @@ class QuizFragment : Fragment() {
         binding.gen.text = getString(R.string.gen_select, args.num)
         return binding.root
 
-
-        initPokemonList()
-
     }
 
-
-    private fun initPokemonList() {
-        val jsonStr = resources.assets.open("ordered_pokemon.json").reader().readText()
-        val type = Types.newParameterizedType(List::class.java, Poke::class.java)
-        val adapter: JsonAdapter<List<Poke>> = moshi.adapter(type)
-
-        pokemonList = adapter.fromJson(jsonStr)
-
+    @UiThread
+    private fun showpokeimg(id: Int) {
+        lifecycleScope.launch {
+            val info = getPokemonInfo(id)
+            setPokemonInfo(info)
+        }
     }
 
+    @WorkerThread
+    private suspend fun getPokemonInfo(id: Int): PokemonInfo {
+        return withContext(Dispatchers.IO) {
+            val retrofit = Retrofit.Builder().apply {
+                baseUrl(BASE_URL)
+                addConverterFactory(MoshiConverterFactory.create(moshi))
+            }.build()
 
+            val service: PokemonService = retrofit.create(PokemonService::class.java)
+            try {
+                service.getPokemon(id).execute().body() ?: throw IllegalStateException("ポケモンの情報が取れません")
+            } catch (e: Exception) {
+                throw IllegalStateException("なにか例外が発生しました。", e)
+            }
+        }
+    }
+    @UiThread
+    private fun setPokemonInfo(info: PokemonInfo) {
+        Picasso.get().load(IMG_URL).into(binding.viPokemon)
+    }
 }

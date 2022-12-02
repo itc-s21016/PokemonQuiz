@@ -5,12 +5,7 @@ import android.os.Bundle
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupWithNavController
-import com.squareup.moshi.JsonAdapter
-import com.squareup.moshi.Moshi
-import com.squareup.moshi.Types
-import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import jp.ac.it_college.std.s21016.pokemonquiz.databinding.ActivityMainBinding
-import jp.ac.it_college.std.s21016.pokemonquiz.service.Poke
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
