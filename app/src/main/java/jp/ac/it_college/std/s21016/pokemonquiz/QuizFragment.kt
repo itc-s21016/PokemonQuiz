@@ -22,8 +22,6 @@ import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 
 private const val BASE_URL = "https://pokeapi.co/api/v2/"
-private const val IMG_URL = "https://pokeapi.co/api/v2/info.sprites.other.officialArtwork.frontDefault"
-
 
 class QuizFragment : Fragment() {
     private var _binding: FragmentQuizBinding? = null
@@ -67,6 +65,7 @@ class QuizFragment : Fragment() {
     }
     @UiThread
     private fun setPokemonInfo(info: PokemonInfo) {
+        val IMG_URL = info.sprites.other.officialArtwork.frontDefault
         Picasso.get().load(IMG_URL).into(binding.viPokemon)
     }
 }
