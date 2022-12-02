@@ -85,3 +85,4 @@ class GenSelectFragment : Fragment() {
         _binding = null
     }
 }
+

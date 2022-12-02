@@ -15,8 +15,8 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        initJsonData(assets)
 
-        //initPokemonList()
 
 
         //画面遷移をわかりやすくするため
@@ -27,12 +27,6 @@ class MainActivity : AppCompatActivity() {
             AppBarConfiguration(navController.graph)
         )
     }
-//    private fun initPokemonList() {
-//        val jsonStr = resources.assets.open("ordered_pokemon.json").reader().readText()
-//        val type = Types.newParameterizedType(List::class.java, Poke::class.java)
-//        val adapter: JsonAdapter<List<Poke>> = moshi.adapter(type)
-//
-//        pokemonList = adapter.fromJson(jsonStr)
-//
-//    }
+    override fun onBackPressed() {
+    }
 }
